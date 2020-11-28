@@ -1,0 +1,117 @@
+﻿@model IEnumerable<InventarioLote.ProductoLote>
+s
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>LISTA DE PRODUCTOS EN INVENTARIO</h2>
+
+<div id="divBuscar" class="container border border-info rounded">
+    <div class="container-fluid bg-info border rounded border-info mb-2 text-center"><h4 class="text-white">BUSCAR PRODUCTO</h4></div>
+    @using (Html.BeginForm("ListaProductos", "Productos", FormMethod.Get, new { @class = "row container-fluid" }))
+    {
+        <div class="row container-fluid mb-2 ">
+            <div class="col-md-3">
+                <p>BUSCAR NOMBRE</p>
+                <input id="txtBuscarProducto" class="form-control" name="txtBuscarProducto" type="text" />
+            </div>
+
+
+        </div>
+        <div class="row container-fluid mb-2 ">
+
+            <div class="col-md-3">
+                <p>PRODUCTO</p>
+                @Html.DropDownList("ProductoId", null, htmlAttributes: new { @class = "form-control", @id = "ProductoIdSLC", required = "required" })
+            </div>
+            <div class="col-md-3">
+                <input class="btn btn-warning text-white align-bottom m-1" type="button" name="btnBuscar" id="btnBuscar" value="REPORTEs" />
+            </div>
+        </div>
+    }
+</div>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Productos.Producto)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ProductoLoteId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Cantidad)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Costo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Fecha)
+        </th>
+        
+        <th></th>
+    </tr>
+   
+    @foreach (var item in Model)
+    {
+          <tr>
+            <th>
+                @item.Productos.Producto
+            </th>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductoLoteId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cantidad)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Costo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Fecha)
+            </td>
+        </tr>
+
+    }
+    @{
+        string [] nProducto ;
+        int count = 0;
+        int cantidad = 0;
+        foreach (ProductoLote element in Model)
+        {
+            cantidad += element.Cantidad;
+        }
+        <div class="container"> <h1>CANTIDAD DISPONIBLE: @cantidad</h1> </div>
+    }
+
+</table>
+@section Scripts {
+    @Scripts.Render("~/bundles/funcionesX")
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+
+        $('#txtBuscarProducto').keyup(function () {
+            text = $('#txtBuscarProducto').val();
+            valSelectText = $('#ProductoIdSLC').find('option:contains(' + text + ')').val()
+            //alert(text);
+            if (valSelectText != undefined) {
+               $('#ProductoIdSLC').val(valSelectText);
+            }
+
+
+            /*$('#ProductoId option:contains(' + text + ')').each(function () {
+                alert(text);
+                if ($(this).text() == text) {
+                    $(this).attr('selected', 'selected');
+                    return false;
+                }
+                return true;
+            });*/
+
+        })
+
+        $('#btnBuscar').click(function () {
+            window.location.href = "/ProductoLotes/BuscarLotes/?ProductoId=" + $('#ProductoIdSLC').val();
+        })
+    </script>
+    }

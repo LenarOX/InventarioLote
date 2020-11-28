@@ -1,0 +1,173 @@
+﻿
+@{
+    ViewBag.Title = "ListaProductos";
+}
+@model IEnumerable<InventarioLote.Productos>
+
+
+<h2>SALIDA INVENTARIO</h2>
+
+<div id="divBuscar" class="container border border-info rounded">
+    <div class="container-fluid bg-info border rounded border-info mb-2 text-center"><h4 class="text-white">BUSCAR PRODUCTO</h4></div>
+    @using (Html.BeginForm("ListaProductos", "Productos", FormMethod.Get, new { @class = "row container-fluid" }))
+    {
+        <div class="row container-fluid mb-2 ">
+            <div class="col-md-3">
+                <p>BUSCAR NOMBRE</p>
+                 <input id="txtBuscarProducto" name="txtBuscarProducto" type ="text"/>
+            </div>
+            
+           
+        </div>
+        <div class="row container-fluid mb-2 ">
+
+            <div class="col-md-3">
+                <p>PRODUCTO</p>
+                @Html.DropDownList("ProductoId", null, htmlAttributes: new { @class = "form-control", @id= "ProductoIdSLC", required = "required" })
+            </div>
+            <div class="col-md-3">
+                <input class="btn btn-warning text-white align-bottom m-1" type="button" name="btnBuscar" id="btnBuscar" value="BUSCAR" />
+            </div>
+        </div>
+    }
+</div>
+
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ProductoId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Producto)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Descripcion)
+        </th>
+       
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductoId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Producto)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Descripcion)
+            </td>
+            
+            <td>
+                <input class="btn btn-warning text-white align-bottom m-1" type="button" id="@item.ProductoId" name="@item.ProductoId" nProducto="@item.Producto" idProducto="@item.ProductoId" value="COMPRAR" />
+            </td>
+        </tr>
+    }
+
+</table>
+@Html.Partial("~/Views/Productos/ModalSalidaProducto.cshtml")
+@section Scripts {
+    @Scripts.Render("~/bundles/funcionesX")
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+
+        $('#txtBuscarProducto').keyup(function () {
+            text = $('#txtBuscarProducto').val();
+            valSelectText = $('#ProductoIdSLC').find('option:contains(' + text + ')').val()
+            //alert(text);
+            if (valSelectText != undefined) {
+               $('#ProductoIdSLC').val(valSelectText);
+            }
+
+
+            /*$('#ProductoId option:contains(' + text + ')').each(function () {
+                alert(text);
+                if ($(this).text() == text) {
+                    $(this).attr('selected', 'selected');
+                    return false;
+                }
+                return true;
+            });*/
+
+        })
+       
+        //MODAL ENVIAR CORREO
+        var cantidadRestante = 0;
+        $("input[value='COMPRAR']").click(function () {
+            $("#modalCPProducto").text($(this)[0].getAttribute("nProducto"))
+            $("#modalCPProductoId").text($(this)[0].getAttribute("idProducto"))
+            var ProductoId = $(this)[0].getAttribute("idProducto")
+            var toUrl = '@Url.Action("GetCodigoLote", "ProductoLotes")'
+
+            $.post(toUrl, { ProductoId: ProductoId }, function (data) {
+
+                /*var arr = [
+                    { val: 1, text: 'One' },
+                    { val: 2, text: 'Two' },
+                    { val: 3, text: 'Three' }
+                ];*/
+
+                //var sel = $("#modalCPSLCLote").appendTo('body');
+
+                $(data).each(function () {
+                    //alert(data)
+                    $("#modalCPSLCLote").append($("<option>").attr('value', this.ProductoLoteId).attr('Costo', this.Costo).attr('Cantidad', this.Cantidad).text(this.ProductoLoteId));
+
+                });
+
+                //alert($('#modalCPSLCLote option:nth-child(1)').val())
+                $("#modalCPPrecio").val($('#modalCPSLCLote option:nth-child(1)').attr('Costo'));
+                $("#modalCPCRestante").val($('#modalCPSLCLote option:nth-child(1)').attr('Cantidad'));
+                $('#modalCPCantidad').attr('max', $('#modalCPSLCLote option:nth-child(1)').attr('Cantidad'))
+                cantidadRestante = $('#modalCPSLCLote option:nth-child(1)').attr('Cantidad');
+                //$("#modalCPPrecio").text($("#modalCPSLCLote option:selected").text());
+                //$("#modalCPCRestante").text($("#modalCPSLCLote option:selected").text());
+            })
+
+            $("#ModalSalidaProducto").modal();
+        })
+
+        $('#modalCPSLCLote').change(function () {
+            cantidadRestante = $('#modalCPSLCLote option:selected').attr('Cantidad');
+            $("#modalCPPrecio").val($('#modalCPSLCLote option:selected').attr('Costo'));
+            $("#modalCPCRestante").val($('#modalCPSLCLote option:selected').attr('Cantidad'));
+            $('#modalCPCantidad').attr('max', $('#modalCPSLCLote option:selected').attr('Cantidad'))
+            $('#modalCPCantidad').val(0);
+            $('#modalCPTotal').val(0)
+
+
+           // window.location.href = "/solicitud/ListaSolicitudes/?idEmpresa=" + $('#idEmpresa').val() + "&idDepartamento=" + $('#idDepartamento').val() + "&idCargo=" + $('#idCargo').val() + "&idUsuario=" + $('#idUsuario').val() + "&idEstado=" + $('#idEstado').val() + "&idCerrada=" + $('#idCerrada').val() + "&idRechazada=" + $('#idRechazada').val() + "&idYear=" + $('#idYear').val() + "&idMes=" + $('#idMes').val() + "&idDia=" + $('#idDia').val() + "&idMostrar=" + $('#idMostrar').val();
+        })
+
+        $('#modalCPCantidad').change(function () {
+
+            $('#modalCPTotal').val($("#modalCPPrecio").val() * $('#modalCPCantidad').val());
+            $("#modalCPCRestante").val(cantidadRestante - $('#modalCPCantidad').val());
+
+        })
+
+
+        $('#modalBtnAceptar').click(function () {
+            var ProductoId = $(this)[0].getAttribute("idProducto")
+            var toUrl = '@Url.Action("GuardarMovimiento", "Movimientos")'
+            var Fecha = "";
+            var ProductoLoteId = $('#modalCPSLCLote option:selected').val();
+            var Cantidad = $('#modalCPCantidad').val();
+            var Total = $('#modalCPTotal').val();
+            $.post(toUrl, { Fecha: Fecha,ProductoLoteId:ProductoLoteId,Cantidad: Cantidad, Total:Total }, function (data) {
+                if (data = 'guardado') {
+                    alert("GUARDADO EXIOSAMENTE");
+                    window.location.href = "/Productos/ListaProductos/"
+                }
+
+            })
+        })
+        $('#btnBuscar').click(function () {
+            window.location.href = "/Productos/BuscarProducto/?ProductoId=" + $('#ProductoIdSLC').val()
+        })
+        
+    </script>
+}

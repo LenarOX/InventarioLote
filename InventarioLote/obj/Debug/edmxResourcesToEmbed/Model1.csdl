@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="InventarioLotesModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Movimientos">
+    <Key>
+      <PropertyRef Name="MovimientoId" />
+    </Key>
+    <Property Name="MovimientoId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Fecha" Type="DateTime" Precision="0" />
+    <Property Name="ProductoLoteId" Type="Int32" Nullable="false" />
+    <Property Name="cantidad" Type="Int32" Nullable="false" />
+    <Property Name="Total" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+    <NavigationProperty Name="ProductoLote" Relationship="Self.FK_Movimientos_ProductoLote" FromRole="Movimientos" ToRole="ProductoLote" />
+  </EntityType>
+  <EntityType Name="ProductoLote">
+    <Key>
+      <PropertyRef Name="ProductoLoteId" />
+    </Key>
+    <Property Name="ProductoLoteId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ProductoId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Cantidad" Type="Int32" Nullable="false" />
+    <Property Name="Costo" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="Fecha" Type="DateTime" Precision="0" />
+    <NavigationProperty Name="Movimientos" Relationship="Self.FK_Movimientos_ProductoLote" FromRole="ProductoLote" ToRole="Movimientos" />
+    <NavigationProperty Name="Productos" Relationship="Self.FK_ProductoLote_Productos" FromRole="ProductoLote" ToRole="Productos" />
+  </EntityType>
+  <EntityType Name="Productos">
+    <Key>
+      <PropertyRef Name="ProductoId" />
+    </Key>
+    <Property Name="ProductoId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Producto" Type="String" MaxLength="10" FixedLength="true" Unicode="true" Nullable="false" />
+    <Property Name="Descripcion" Type="String" MaxLength="30" FixedLength="true" Unicode="true" Nullable="false" />
+    <Property Name="Precio" Type="Decimal" Precision="18" Scale="2" />
+    <NavigationProperty Name="ProductoLote" Relationship="Self.FK_ProductoLote_Productos" FromRole="Productos" ToRole="ProductoLote" />
+  </EntityType>
+  <EntityType Name="sysdiagrams">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="principal_id" Type="Int32" Nullable="false" />
+    <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version" Type="Int32" />
+    <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+  </EntityType>
+  <Association Name="FK_Movimientos_ProductoLote">
+    <End Role="ProductoLote" Type="Self.ProductoLote" Multiplicity="1" />
+    <End Role="Movimientos" Type="Self.Movimientos" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ProductoLote">
+        <PropertyRef Name="ProductoLoteId" />
+      </Principal>
+      <Dependent Role="Movimientos">
+        <PropertyRef Name="ProductoLoteId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_ProductoLote_Productos">
+    <End Role="Productos" Type="Self.Productos" Multiplicity="1" />
+    <End Role="ProductoLote" Type="Self.ProductoLote" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Productos">
+        <PropertyRef Name="ProductoId" />
+      </Principal>
+      <Dependent Role="ProductoLote">
+        <PropertyRef Name="ProductoId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="InventarioLotesEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Movimientos" EntityType="Self.Movimientos" />
+    <EntitySet Name="ProductoLote" EntityType="Self.ProductoLote" />
+    <EntitySet Name="Productos" EntityType="Self.Productos" />
+    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
+    <AssociationSet Name="FK_Movimientos_ProductoLote" Association="Self.FK_Movimientos_ProductoLote">
+      <End Role="ProductoLote" EntitySet="ProductoLote" />
+      <End Role="Movimientos" EntitySet="Movimientos" />
+    </AssociationSet>
+    <AssociationSet Name="FK_ProductoLote_Productos" Association="Self.FK_ProductoLote_Productos">
+      <End Role="Productos" EntitySet="Productos" />
+      <End Role="ProductoLote" EntitySet="ProductoLote" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
